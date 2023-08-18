@@ -35,18 +35,19 @@
     </style>
 </head>
 <body>
-    <script>
-        const email = "{{ email }}";
-        const date_time = "{{ date_time }}";
-
-        Swal.fire({
-            icon: 'success',
-            title: 'Tweet Successful!',
-            html: `Your Post has been uploaded.`,
-            showConfirmButton: false,
-            timer: 3000
-        });
-    </script>
+    <!-- ... (other parts of thankyou.html) ... -->
+<script>
+    Swal.fire({
+        icon: 'success',
+        title: '{{ alert_title }}',
+        text: '{{ alert_message }}',
+        timer: 2000,
+        showConfirmButton: false
+    }).then(function() {
+        window.location.href = '/sessions';
+    });
+</script>
+<!-- ... (other parts of thankyou.html) ... -->
 
     <div class="container">
         <div class="btn-container">

@@ -29,9 +29,11 @@ async def book_session(
             "date_time": date_time,
         }
         await sessions_collection.insert_one(session_data)
+        
+        # Return a success message to the user
         return templates.TemplateResponse(
             "thankyou.html",
-            {"request": request},
+            {"request": request, "alert_title": "Booking Successful", "alert_message": "Your session has been booked."},
         )
     except Exception as e:
         alert_message = f"An error occurred: {str(e)}"
@@ -40,7 +42,25 @@ async def book_session(
             {"request": request, "alert_message": alert_message},
         )
 
-from fastapi import Request
+@app.post("/delete-session/")
+async def delete_session(
+    request: Request, email: str = Form(...), date_time: str = Form(...)
+):
+    try:
+        delete_result = await sessions_collection.delete_one({"email": email, "date_time": date_time})
+        if delete_result.deleted_count == 0:
+            raise HTTPException(status_code=404, detail="Session not found")
+        
+        # Return a success message to the user
+        return templates.TemplateResponse(
+            "thankyou.html",
+            {"request": request, "alert_title": "Deletion Successful", "alert_message": "Session deleted successfully."},
+        )
+    except Exception as e:
+        return templates.TemplateResponse(
+            "thankyou.html",
+            {"request": request, "alert_message": f"An error occurred: {str(e)}"},
+        )
 
 @app.get("/sessions/", response_class=HTMLResponse)
 async def get_sessions(request: Request):

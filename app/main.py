@@ -11,6 +11,7 @@ templates = Jinja2Templates(directory="app/templates")
 client = AsyncIOMotorClient("mongodb+srv://saadsgk:saad1234@socialmedia.ia5rj.mongodb.net/")
 db = client["blogs"]
 sessions_collection = db["blog_app"]
+user_collection = db["users"]
 
 class SessionCreate(BaseModel):
     email: str
@@ -19,6 +20,10 @@ class SessionCreate(BaseModel):
 class SessionResponse(BaseModel):
     email: str
     date_time: str
+class User(BaseModel):
+    name:str
+    email:str
+    password:str
 
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
@@ -72,4 +77,20 @@ async def get_sessions(request: Request):
         return templates.TemplateResponse(
             "sessions.html",
             {"alert_message": f"An error occurred: {str(e)}"},
+        )
+@app.post('/user',response_class=HTMLResponse)
+async def create_user(request: Request):
+    try:
+        session_data =User(**await request.form())
+
+        await user_collection.insert_one(session_data.dict())
+        return templates.TemplateResponse(
+            "thankyou.html",
+            {"request": request, "alert_title": "Registration Successful", "alert_message": "User Created."},
+        )
+    except Exception as e:
+        alert_message = f"An error occurred: {str(e)}"
+        return templates.TemplateResponse(
+            "thankyou.html",
+            {"request": request, "alert_message": alert_message},
         )

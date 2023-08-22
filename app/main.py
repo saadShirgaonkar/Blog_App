@@ -8,7 +8,7 @@ app = FastAPI()
 templates = Jinja2Templates(directory="app/templates")
 
 # MongoDB Connection
-client = AsyncIOMotorClient("mongodb+srv://saadsgk:saad1234@socialmedia.ia5rj.mongodb.net/")
+client = AsyncIOMotorClient("mongodb://localhost:27017")
 db = client["blogs"]
 sessions_collection = db["blog_app"]
 user_collection = db["users"]
@@ -77,20 +77,4 @@ async def get_sessions(request: Request):
         return templates.TemplateResponse(
             "sessions.html",
             {"alert_message": f"An error occurred: {str(e)}"},
-        )
-@app.post('/user',response_class=HTMLResponse)
-async def create_user(request: Request):
-    try:
-        session_data =User(**await request.form())
-
-        await user_collection.insert_one(session_data.dict())
-        return templates.TemplateResponse(
-            "thankyou.html",
-            {"request": request, "alert_title": "Registration Successful", "alert_message": "User Created."},
-        )
-    except Exception as e:
-        alert_message = f"An error occurred: {str(e)}"
-        return templates.TemplateResponse(
-            "thankyou.html",
-            {"request": request, "alert_message": alert_message},
         )
